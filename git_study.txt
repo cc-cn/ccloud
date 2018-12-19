@@ -1,0 +1,66 @@
+https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/0013743256916071d599b3aed534aaab22a0db6c4e07fd0000
+
+
+email: chchnhu@163.com
+user_name:chencheng
+
+
+step
+mkdir cc_git
+cd cc_git
+git init  将新建的空文件夹变为git仓库
+touch example.txt
+git add example.txt  可同时add   多个纯文本文件
+git commit -m "wrote a example file"  提交所有add的文件，并写上提交说明，便于以后回到找到旧版本
+上面这两部实现文件从工作区到暂存区再到版本库
+
+git status 查看哪些文件被修改但没提交
+git diff example.txt  提交之前，查看具体被修改了哪些地方
+
+git log查看历史版本
+
+git reset --hard HEAD^回到上一个版本，等价于git reset --hard HEAD~1  如果有多个文件不太好办啊啊？？
+git reset --hard HEAD^^回到上上一个版本，等价于git reset --hard HEAD~2
+以此类推
+
+另一种方式：git reset --hard 版本号
+这里的版本号可以通过上面的git log或者git reflog查看，这个方法可以从旧版本回到更新的版本。。
+
+git checkout -- readme.txt两个含义：若文件被修改但没add，则回到修改前的状态。或者 文件add之后又被修改，则回到刚刚add之后的状态。
+git reset HEAD file可以把暂存区的修改撤销掉（unstage），重新放回工作区
+
+删除文件：
+rm test.txt
+git rm test.txt
+git commit -m "remove test.txt"
+
+如果上面第一步是误删，则在第一步后使用git checkout -- test.txt恢复文件。（因为此时文件还在版本库里）
+
+创建远程仓库（即github），参见最上面网页的远程控制部分。这部分的意义是让github认识你的本地机器，以防别人随便修改。因此如果有多台机器，都要配置一下。。那在临时机器上岂不是不能上传git。。。
+
+建立本地和远程的连接：
+git remote add origin git@github.com:michaelliao/learngit.git
+git -u push origin master （-u参数只在第一次连接时用到，以后上传时只要$ git push origin master）
+
+从云端克隆到本地，得到一个名为cc_git的文件夹。  如果本地有这个文件夹的旧版本，怎么同步更新呢？？
+git clone git@github.com:cc-cn/cc_git.git
+
+
+
+
+常用命令总结：
+每次修改之后要：git add --all
+然后提交： git commit -m "dosomethon"
+上传： sudo git push origin master  （教程上不用加sudo，但公司台式机上要加才能运行。）
+
+from hyy
+云端的更新同步到本地：git pull
+不需要sudo
+注意：如果云端和本地都更新了，pull或push会有问题。最好是修改之前先确保本地和云端是同一版本
+
+
+
+
+
+
+
