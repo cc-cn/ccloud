@@ -1,0 +1,77 @@
+rfcn from huyy
+
+cd $ROOT_DIR/caffe && make -j20 && make pycaffe  ##在199上编译时出现了cv的问题，进入source activate python2,并将113 caffe中的Makefile.config替换到rfcn/caffe/下即可编译。
+cd $ROOT_DIR/lib && make
+
+model dir: $ROOT_DIR/jobs/pd/pz_S_net_day
+
+TRAIN:
+1. mkdir $ROOT_DIR/jobs/pd/your_task
+2. cd $ROOT_DIR/jobs/pd/your_task && mkdir models_solverstates logs
+3. modify config.yaml
+4. create *.prototxt:
+sh ../../../lib/tools/create_net.sh train_data_path net_type[train/deploy/solver/all] net_name[pz_L_net,...] split_to_rpn_layer_name[b6_sum] end_body_layer_name[b8_sum]
+
+example:sh ../../../lib/tools/create_net.sh train_img_label_size all pz_L_net b6_sum b8_sum
+
+5. train from init:(label can be h5 or xml)
+../../../lib/tools/rfcn_train.sh img_label_size cache_name[imgwithallbox_pd, voc,...] gpu_id
+
+train from caffemodel or snapshot:
+../../../lib/tools/rfcn_resume.sh img_label cache_name[imgwithallbox_pd, voc,...] resume_model model_solverstate_flag[m/s] gpu_id
+
+TEST:
+1. test:
+python code:
+../../../lib/tools/rfcn_test.sh img_label unnormalized_caffemodel gpu_id [--vis] [--save_dir]
+cpp code:
+../../../caffe/build/tools/rfcn_predict [-show] deploy caffemodel img_file config_file
+2. evaluation:
+../eval.sh caffemodel resize_scale
+3. compare different models:
+ ../compare.sh result1 result2 ...
+
+
+
+
+移植代码到新环境记得make，tarin.sh, test.sh里加上需要的pythonpath，这样可以使代码简洁。
+每次改变了数据重头训练的时候，需要删除之前的缓存 /home/chencheng/ssd_from_hyy/data/cache/×
+
+占用显存很大，约7G  ！！！1080的卡被其他人占用一部分，训练时显示out of memory.后来把config.py里的batch_size改成8才可以训练。
+在huabing的提示下，训练log里面会有各个层显存占用，打开一看，发现是图片resize成540,太大了。改成320后，显存立马降了下来。199的卡占用倒是很少，以后尽量使用199的服务器。
+
+
+第一次训练
+yingshi_task_raw  ， 10000次，  batch_size = 8 ，其他参数是config生成的默认配置。
+
+
+画出的loss曲线明显有问题，检查一下parse_log.py函数。 huyy说脚本前5000次会出问题。好好修正一下！
+5000次之后图片正常了。神奇
+
+
+
+在测试集上测试：有的测试图片比较大，1920*1080的，显示超出屏幕范围，咋办？能否无论图片多大，都刚好占满屏幕。show的时候加一些代码？//半年后评论：幼稚哦，源码源码！！
+
+
+第二次训练
+yingshi_task_small batch_size=8, scale 从540变成了320, 其它不变。
+loss,测试效果均好于前一种。奇怪的是，连测试时间也大大缩短，why？？caffemodel都是2.5M//半年后评论：额。。。
+
+
+画roc曲线：sh ../eval.sh models_solverstates/unnormalized_iter_400000.caffemodel 320
+GPU 10ms，怎么用cpu测试？
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

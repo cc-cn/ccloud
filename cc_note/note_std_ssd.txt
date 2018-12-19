@@ -1,0 +1,58 @@
+在111服务器复现标准ssd
+大部分按官网readme： https://github.com/weiliu89/caffe/tree/ssd
+
+完成后配置caffe到python环境变量
+
+sudo vim ~/.bashrc
+export PYTHONPATH=~/caffe/python:$PYTHONPATH    //根据实际caffe路径来写
+export LD_LIBRARY_PATH=~/caffe/build/lib:$LD_LIBRARY_PATH
+source ~/.bashrc  //使环境变量生效，每个已开启的终端窗口都要做一次。或者关了重开。
+
+USE_CUDNN := 1
+WITH_PYTHON_LAYER := 1
+将Makefile.config中sm=20,30那两行删掉，那是旧版本的。没什么用。（可以直接复制之前配置好的同环境文件）
+
+make clean && make
+make -j20
+
+make的时候出现detection_output_layer的问题，查了一下是cpp版本问题。解决方案https://github.com/BVLC/caffe/issues/4957中的高赞回答。
+
+
+之前在199服务器遇到问题：.build_release/lib/libcaffe.so: undefined reference to `cv::VideoCapture::VideoCapture()'
+collect2: error: ld returned 1 exit status
+make: *** [.build_release/examples/ssd/ssd_detect.bin] Error 1
+这是opencv的问题，可以仿照111服务器上搭建anaconda3-python2-opencv的方法在199上搭建一遍。以后再说
+
+make runtest -j20失败
+出现了cudnn的问题，注释掉use_cudnn后仍然有
+
+改在192上搭建：
+下载 https://github.com/weiliu89/caffe/tree/ssd，直接copy ssd_from_hyy里的Makefile.config和Makefile文件。
+make 直到 make runtest -j20一路无误 （看来这块配置文件很关键！）很慢，30min
+
+所需下载的数据存放在  ~/data/ssd/下，两个生成数据的函数各需改一处路径。并在.bashrc下加入python路径：
+export PYTHONPATH=~/caffe/python:$PYTHONPATH
+export LD_LIBRARY_PATH=~/caffe/build/lib:$LD_LIBRARY_PATH
+
+应该又是数据的问题，发现label有的，JPEG里没有！只能在VOC2007上训练了，大改动两个.sh文件
+
+训练python examples/ssd/ssd_pascal.py
+测试python examples/ssd/score_ssd_pascal.py
+终于可以训练了。也可在图片是测试。但python examples/ssd/ssd_pascal_webcam.py还有eror。暂时不管。
+
+接下来用examples里的ssd_detect来测试zhicheng的model。可以cp出一个my_ssd_detect.cpp到tools下，再进行修改，能够可视化以及保存图片！make出一个可执行文件.bin 。后续可以在看看那个python版本的测试函数python examples/ssd/score_ssd_pascal.py，然后对应写一个自己的。 接口不是通用的，不同问题要有不同接口。所以命名的时候最好和问题本身有关系。就像标准版的命名一样。最后再改一下训练接口，做到便于调参数，简化 从数据到train要做的准备工作。加强程序鲁棒性，尽量只需要在接口处改动就可适应对应问题。写好readme文档。
+
+成功测试
+
+修改my_ssd_detect.cpp，添加vis，save_dir, gpu_id, ，resize接口！！用熟了！！
+
+
+
+
+
+
+
+
+
+
+

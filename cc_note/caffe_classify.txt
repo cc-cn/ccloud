@@ -1,0 +1,29 @@
+本文档主要记录使用caffe分类ImageNet数据集（1000类）
+源码安装caffe，git clone https://github.com/BVLC/caffe.git
+也可以在其它检测框架下（我是在ssd下做的，包含了caffe_raw所有文件）
+
+下载ILSVRC2012官方数据训练数据：只需要138G的训练集和6.3G的验证集合。因为是分类问题，无需下载bbox文件。train.txt 和 val.txt中会有每张图片的类别0~999
+关于数据，详细按照111：caffe/examples/imagenet/readme.md步骤下载txt文件、生成lmdb文件
+下载的数据分别放在：111：/home/chencheng/data/ImageNet_pretrain
+制作的lmdb数据放在：111：caffe/examples/imagenet/
+
+
+
+
+训练集可以有几个lmdb文件？？看看源码怎么调用的
+
+先检验数据是否正确：
+运行examples/imagenet/train_caffenet.sh，发现loss不降，始终在6.9~6.91，accuracy始终在0.001附近
+
+google了一下，https://github.com/BVLC/caffe/issues/59最后一条回答解决了上述问题。即train_val.prototxt里bias_filler里的1全部换成0.1
+正常训练结果：
+
+开始使用自己的网络，放在caffe/jobs/imagenet_1000/tinyvgg/
+
+生成的prototxt中层的名字不是自定义的，好像使用了默认的名字。why？//这个脚本导致的to_proto(n.loss)，应该使用n.to_proto()，应该使用n.layername或n[layername]方式定义新的层。
+
+分类问题最后全连接层之前一般跟着一个global pooling，使得feature size = 1x1，然后调用flatten层，使之resize成一个向量。这样在做全连接的时候可以减小参数量。
+
+写了一个caffenet.py脚本，里面放了分类问题常见网络。以后对这个熟练之后可以和model_libs合并。把读数据、写loss放到主文件里。像ssd那样
+
+batchsize设为128以上，lr从0.01开始，一般5w次就可以降一次lr

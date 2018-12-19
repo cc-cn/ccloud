@@ -1,0 +1,1608 @@
+1.
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> ans;
+        int len = nums.size();
+        for(int i=0;i<len-1;i++)
+        {
+            for(int j=i+1;j<len;j++)
+            {
+                if(nums[i]+nums[j]==target)
+                {
+                    ans.push_back(i);
+                    ans.push_back(j);
+                    return ans;
+                }
+
+            }
+        }
+        
+    }
+};
+
+注：虽然通过了，但这是时间复杂度O(n^2)的方法，官网提供O(n*lgn)的办法。如下：
+public int[] twoSum(int[] nums, int target) {
+    Map<Integer, Integer> map = new HashMap<>();
+    for (int i = 0; i < nums.length; i++) {
+        map.put(nums[i], i);
+    }
+    for (int i = 0; i < nums.length; i++) {
+        int complement = target - nums[i];
+        if (map.containsKey(complement) && map.get(complement) != i) {
+            return new int[] { i, map.get(complement) };
+        }
+    }
+    throw new IllegalArgumentException("No two sum solution");
+}
+
+用到vector，map容器；官方文档 http://www.cplusplus.com/reference
+
+unordered_map c++ reference 是c++ 哈希表的实现模板
+以下是O(n)时间复杂度方法
+vector<int> twoSum(vector<int> &numbers, int target)
+{
+    //Key is the number and value is its index in the vector.
+	unordered_map<int, int> hash;
+	vector<int> result;
+	for (int i = 0; i < numbers.size(); i++) {
+		int numberToFind = target - numbers[i];
+
+            //if numberToFind is found in map, return them
+		if (hash.find(numberToFind) != hash.end()) {
+                    //+1 because indices are NOT zero based
+			result.push_back(hash[numberToFind] + 1);
+			result.push_back(i + 1);			
+			return result;
+		}
+
+            //number was not found. Put it in the map.
+		hash[numbers[i]] = i;
+	}
+	return result;
+}
+
+2.
+用到结构体，链表。
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* p = l1;
+        int len1=1;
+        while(p->next !=NULL){len1++;p=p->next;}
+        
+        ListNode* q = l2;
+        int len2=1;
+        while(q->next !=NULL){len2++;q=q->next;}
+        
+        int len3;
+        if(len1>len2)len3=len1+1;
+        else len3=len2+1;
+        
+        ListNode* v[len3];
+        for(int i=0;i<len3;i++)
+        {
+            v[i]=(ListNode*)malloc(sizeof(ListNode));
+        }
+        
+        int tmp=0;
+        v[0]->val=l1->val+l2->val;
+        v[0]->next=v[1];
+        if(v[0]->val>9){v[0]->val-=10;tmp=1;}
+        
+        p = l1;
+        q = l2;
+        for(int i=1;i<len3-1;i++)
+        {
+            v[i]->val=tmp;
+            tmp=0;
+            v[i]->next=v[i+1];
+            if(p->next !=NULL)
+            {
+                p=p->next;
+                v[i]->val+=p->val;
+            }
+            if(q->next !=NULL)
+            {
+                q=q->next;
+                v[i]->val+=q->val;
+            }
+                      
+            if(v[i]->val>9){v[i]->val-=10;tmp=1;}    
+        }
+        if(tmp==0){v[len3-2]->next=NULL;}
+        else {v[len3-1]->val=1;v[len3-1]->next=NULL;}
+        return v[0];
+        
+        
+        
+    }
+};
+
+注：一次性通过，这题不难。考察结构体（链表）基本用法。
+定义量表数组的时候有两种办法。
+1、通过定义指针数组，再malloc空间。
+2、直接定义链表数组，但对于含有初始化函数的结构体，这个办法好像会出错。
+即ListNode v[3];会产生bug。使用ListNode v[]={0,0,0};不含有bug。
+
+
+3.
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int len=s.length();
+        string s1;
+        if(len==1 || len==0)return len;
+        int max=1;
+        int begin=0;
+        for(int i=1;i<len;i++)
+        {
+            s1=s.substr(begin,i);
+            if(s1.find(s[i])<i-begin)
+            {
+                if(max<i-begin)max=i-begin;
+                begin+=s1.find(s[i])+1;
+            }
+            else if(i==len-1)
+            {
+                if(max<i-begin+1)max=i-begin+1;
+            }
+        }
+        return max;
+        
+    }
+};
+
+注：这题考察string的几个函数—substr(),find(),length()；时间复杂度O(nm),m是最大长度
+答案中有个O(n)的办法，用的是map、set、HashSet（Java语言），好好了解一下这类特殊的容器
+
+关于构造函数、析构函数、new、delete，参见http://blog.csdn.net/github_35160620/article/details/52602332
+
+string的几个常用函数
+#include<iostream>
+#include<string>
+
+using namespace std;
+
+int main()
+{
+    string s("hello");
+    string s1=s.substr(1,3);
+    cout<<s.back()<<endl;
+
+    s.insert(2, "as");
+    s.replace(1, 3, "1");
+    unsigned long id=s.find('o');
+}   
+ 
+
+  
+4、没有通过，对年m==2 or n==2的情形有问题，单独讨论？
+
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m=nums1.size();
+        int n=nums2.size();
+        if(m==0)
+        {
+            if(n%2==0)
+            return (nums2[n/2-1]+nums2[n/2])/2.0;
+            else
+            {
+                return 1.0*nums2[n/2];
+            }
+        }
+        if(n==0)
+        {
+            return findMedianSortedArrays(nums2, nums1);
+        }
+        if(m==1)
+        {
+            if(n==1)return (nums1[0]+nums2[0])/2.0;
+            else if(n%2==0)
+            {
+                if(nums1[0]<nums2[n/2-1])return 1.0*nums2[n/2-1];
+                else if(nums1[0]>nums2[n/2])return 1.0*nums2[n/2];
+                else return nums1[0];
+            }
+            else
+            {
+                if(nums1[0]<nums2[n/2-1])return (nums2[n/2-1]+nums2[n/2])/2.0;
+                else if(nums1[0]>nums2[n/2+1])return (nums2[n/2]+nums2[n/2+1])/2.0;
+                else return (nums1[0]+nums2[n/2])/2.0;
+            }
+        }
+        else if(n==1)
+        {
+            return findMedianSortedArrays(nums2, nums1);
+        }
+        else
+        {
+            if(m==2 && n==2)
+            {
+                int big=(nums1[1]>nums2[1]?nums1[1]:nums2[1]);
+                int small=(nums1[0]<nums2[0]?nums1[0]:nums2[0]);
+                return (nums1[0]+nums1[1]+nums2[0]+nums2[1]-small-big)/2.0;
+                    
+            }
+            else
+            {
+                double mid1,mid2;
+                if(m%2==0 && n%2==0)
+                {
+                    mid1=(nums1[m/2]+nums1[m/2-1])/2.0;
+                    mid2=(nums2[n/2]+nums2[n/2-1])/2.0;
+                    if(mid1>mid2 || mid1==mid2)
+                    {
+                        if(m==n)
+                        {
+                            vector<int>::iterator i1=nums1.begin(), j1=nums1.begin()+m/2+1;
+                            vector<int> v1(i1, j1);
+                            vector<int>::iterator i2=nums2.begin()+n/2-1, j2=nums2.end();
+                            vector<int> v2(i2, j2);
+                            return findMedianSortedArrays(v1, v2);
+                        }
+                        else if(m>n)
+                        {
+                            vector<int>::iterator i1=nums1.begin(), j1=nums1.end()-n/2;
+                            vector<int> v1(i1, j1);
+                            vector<int>::iterator i2=nums2.begin()+n/2, j2=nums2.end();
+                            vector<int> v2(i2, j2);
+                            return findMedianSortedArrays(v1, v2);
+                        }
+                        else
+                        {
+                            vector<int>::iterator i1=nums1.begin(), j1=nums1.begin()+m/2;
+                            vector<int> v1(i1, j1);
+                            vector<int>::iterator i2=nums2.begin()+m/2, j2=nums2.end();
+                            vector<int> v2(i2, j2);
+                            return findMedianSortedArrays(v1, v2);                           
+                        }
+
+                    }
+                    else
+                    {
+                        return findMedianSortedArrays(nums2, nums1);
+                    }
+                }
+                else if(m%2==0 && n%2==1)
+                {
+                    mid1=(nums1[m/2]+nums1[m/2-1])/2.0;
+                    mid2=nums2[n/2];
+                    if(mid1>mid2)
+                    {
+                        vector<int>::iterator i1=nums1.begin(), j1=nums1.begin()+m/2;
+                        vector<int> v1(i1, j1);
+                        vector<int>::iterator i2=nums2.begin()+n/2, j2=nums2.end();
+                        vector<int> v2(i2, j2);
+                        return findMedianSortedArrays(v1, v2);
+                    }
+                    else
+                    {
+                        vector<int>::iterator i1=nums1.begin()+m/2, j1=nums1.end();
+                        vector<int> v1(i1, j1);
+                        vector<int>::iterator i2=nums2.begin(), j2=nums2.begin()+n/2+1;
+                        vector<int> v2(i2, j2);
+                        return findMedianSortedArrays(v1, v2);
+                    }
+                }
+                else if(m%2==1 && n%2==0)
+                {
+                    return findMedianSortedArrays(nums2, nums1);
+                }
+                else 
+                {
+                    mid1=nums1[m/2];
+                    mid2=nums2[n/2];
+                    if(mid1>mid2 || mid1==mid2)
+                    {
+                        vector<int>::iterator i1=nums1.begin(), j1=nums1.begin()+m/2+1;
+                        vector<int> v1(i1, j1);
+                        vector<int>::iterator i2=nums2.begin()+n/2, j2=nums2.end();
+                        vector<int> v2(i2, j2);
+                        return findMedianSortedArrays(v1, v2);
+                    }
+                    else
+                    {
+                        return findMedianSortedArrays(nums2, nums1);
+                    }
+                    
+                } 
+            }
+           
+        }
+
+        
+    }
+};
+
+5.
+一次通过
+
+方法一：对最长回文串的中心点进行遍历。分奇偶性讨论。两重for循环效率高，代码复杂。
+class Solution {
+public:
+    string longestPalindrome(string s) {
+    if(s=="")return "";
+    
+    unsigned long len=s.length();
+    if(len==1)return s;
+    
+    int max=1;
+    string ss=s.substr(0,1);
+    for(int i=1;i<len-1;i++)
+    {
+        if(i<(len+1)/2)
+        {
+            for(int j=1;j<i+1;j++)
+            {
+                if(s[i-j]!=s[i+j])
+                {
+                    if(max<2*(j-1)+1)
+                    {
+                        ss=s.substr(i-j+1,2*(j-1)+1);
+                        max=2*j-1;
+                        
+                    }
+                    break;
+                }
+                if(j==i)
+                {
+                    if(max<2*i+1)
+                    {
+                        ss=s.substr(0,2*i+1);
+                        max=2*i+1;
+                        
+                    }
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for(int j=1;j<len-i;j++)
+            {
+                if(s[i-j]!=s[i+j])
+                {
+                    if(max<2*(j-1)+1)
+                    {
+                        ss=s.substr(i-j+1,2*(j-1)+1);
+                        max=2*j-1;
+                        
+                    }
+                    break;
+                }
+                if(j==len-i-1)
+                {
+                    if(max<2*j+1)
+                    {
+                        ss=s.substr(i-j,2*j+1);
+                        max=2*j+1;
+                        
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    
+    int max2=0;
+    string ss2="";
+    for(int i=0;i<len-1;i++)
+    {
+        if(i<len/2)
+        {
+            for(int j=0;j<i+1;j++)
+            {
+                if(s[i-j]!=s[i+1+j])
+                {
+                    if(max<2*j)
+                    {
+                        ss2=s.substr(i-j+1,2*j);
+                        max2=2*j;
+                        
+                    }
+                    break;
+                }
+                if(j==i)
+                {
+                    if(max2<2*(i+1))
+                    {
+                        ss2=s.substr(0,2*(i+1));
+                        max2=2*(i+1);
+                        
+                    }
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for(int j=0;j<len-i-1;j++)
+            {
+                if(s[i-j]!=s[i+j+1])
+                {
+                    if(max2<2*j)
+                    {
+                        ss2=s.substr(i-j+1,2*j);
+                        max2=2*j;
+                        
+                    }
+                    break;
+                }
+                if(j==len-i-2)
+                {
+                    if(max2<2*(j+1))
+                    {
+                        ss2=s.substr(i-j,2*(j+1));
+                        max2=2*(j+1);
+                        
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    if(max2>max)return ss2;
+    else return ss;
+        
+    }
+};
+
+方法二：对最长回文串的起始点进行遍历。三重for循环效率低，代码简单。
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if(s=="")return s;
+        unsigned long len=s.length();
+        int max=1;
+        string ss=s.substr(0,1);
+        for(int i=0;i<len-1;i++)
+        {
+            for(int j=i+max;j<len;j++)
+            {
+                int k=0;
+                while(s[i+k]==s[j-k])
+                {
+                    k++;
+                    if(i+k>j-k||i+k==j-k)
+                    {
+                        if(max<j-i+1)
+                        {
+                            ss=s.substr(i,j-i+1);
+                            max=j-i+1;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return ss;
+        
+    }
+};
+
+
+9.
+虽然编译通过了，但没有满足不占用额外内存的要求。（即应该使用O（1）的内存占用，我用了O（n））
+
+class Solution {
+public:
+    bool isPalindrome(int x) {
+    if(x<0)return false;
+    else if(x==0)return true;
+    else
+    {
+        vector<int> v;
+        int b=x;
+        while(b!=0)
+        {
+            v.push_back(b%10);
+            b/=10;
+        }
+        unsigned long len=v.size();
+        for(int i=0;i<len/2;i++)
+        {
+            if(v[i]!=v[len-1-i])return false;
+        }
+        return true;
+    }
+        
+    }
+};
+
+10.
+
+太复杂了，没有编完
+
+bool isMatch(string s, string p) {
+    unsigned long lens=s.size();
+    unsigned long lenp=p.size();
+    if(lens==0)
+    {
+        if(lenp==0)return true;
+        else
+        {
+            int num1=0;//num of '*'
+            for(int i=0;i<lenp;i++)
+            {
+                if(p[i]=='*')num1++;
+            }
+            if(num1==lenp)return true;
+            else return false;
+        }
+    }
+    else if(lens==1)
+    {
+        if(lenp==0)return false;
+        else
+        {
+            int num1=0; // sum of s[0] and '.'
+            int num2=0; // num of '*'
+            for(int i=0;i<lenp;i++)
+            {
+                if(p[i]==s[0]|| p[i]=='.')num1++;
+                else if(p[i]=='*')num2++;
+                else return false;
+            }
+            if(num1<2)return true;
+            else return false;
+        }
+    }
+    else
+    {
+        if(p[0]!='*')
+        {
+            unsigned long id=p.find("*");
+            if(id>lenp-1)
+            {
+                if(lenp!=lens)return false;
+                else
+                {
+                    for(int i=0;i<lenp;i++)
+                    {
+                        if(p[i]!='.' && p[i]!=s[i])return false;
+                    }
+                    return true;
+                }
+            }
+            else
+            {
+                string phead=p.substr(0,id);
+                if(lens<id)return false;
+                else
+                {
+                    for(int i=0;i<id;i++)
+                    {
+                        if(p[i]!='.' && p[i]!=s[i])return false;
+                    }
+                    return isMatch(s.substr(id,lens-id),p.substr(id,lenp-id));
+                }
+                
+            }
+        }
+        else
+        {
+            string ptail=p.substr(1,lenp-1);
+            
+        }
+    }
+    return false;
+}
+
+
+15.Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
+思路:先排序,利用一个lemma:一个数组中,找出和为定值的两个数有O(n)算法,因此这个问题有O(n^2)算法,最后就是去重了.
+
+class Solution {
+public:
+    vector< vector<int> > threeSum(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector< vector<int> > ans;
+        vector<int>::iterator it=nums.begin();
+        if(nums.size()<3) return ans;
+        while(it+2!=nums.end() && it+1!=nums.end())
+        {
+            vector<int>::iterator left=it+1;
+            vector<int>::iterator right=nums.end()-1;
+            while(left<right)
+            {
+                if(*left+*right+*it> 0)right-=1;
+                else if(*left+*right+*it<0)left+=1;
+                else 
+                {
+                    vector<int> tmp;
+                    tmp.push_back(*it);
+                    tmp.push_back(*left);
+                    tmp.push_back(*right);
+                    ans.push_back(tmp);
+                    right-=1;
+                    while(*right==*(right+1) && right > left)right-=1; //去重
+                    left+=1;
+                    while(*left==*(left-1) && left < right)left+=1;//去重
+                }
+            }
+            it+=1;
+            while(*it==*(it-1) && it+1!=nums.end())it+=1;//去重
+        }
+        return ans;
+
+    }
+};
+
+
+17.
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        string data[]={"abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+        int len=digits.size();
+        vector<string> ans;
+        if(len==0)return ans;
+        else if(len==1)
+        {
+            int id=digits[0]-'2';
+            for(int i=0;i<data[id].size();i++)
+            {
+                string tmp="a";
+                tmp[0]=data[id][i];
+                ans.push_back(tmp);
+            }
+            return ans;
+        }
+        else
+        {
+            string tail=digits.substr(1,len-1);
+            int id=digits[0]-'2';
+            vector<string> ans_tail=letterCombinations(tail);
+            for(int i=0;i<data[id].size();i++)
+            {
+                vector<string>::iterator it=ans_tail.begin();
+                while(it!=ans_tail.end())
+                {
+                    string tmp="a";
+                    tmp[0]=data[id][i];
+                    ans.push_back(static_cast<string>(tmp+*it));
+                    it++;
+                }
+            }
+            return ans;
+            
+        }
+        
+    }
+};
+
+20、
+一种低效的递归方法，重复计算太多。
+class Solution {
+public:
+    bool isValid(string s) {
+        map<char,char> m;
+        m['(']=')';
+        m['[']=']';
+        m['{']='}';
+        int len=s.size();
+        if(len==0) return true;
+        else
+        {
+            char head=s[0],tail;
+            if(head==')' || head==']' || head=='}' )return false;
+            else 
+            {
+                tail=m[head];
+                for(int i=len-1;i>0;i--)
+                {
+                    char si=s[i];
+                    if(si==tail && isValid(s.substr(1,i-1)) && isValid(s.substr(i+1,len-1-i)))return true;
+                }
+                return false;
+            }
+            
+            
+            
+        }
+        
+    }
+};
+
+
+一个更慢的办法，每次去掉相邻的一组配对。
+
+class Solution {
+public:
+    bool isValid(string s) {
+        map<char,char> m;
+        m['(']=')';
+        m['[']=']';
+        m['{']='}';
+        int len=s.size();
+        if(len==0) return true;
+        else if(len==1)return false;
+        else
+        {
+            for(int i=0;i<len-1;i++)
+            {
+                if(s[i]=='(' || s[i]=='[' || s[i]=='{')
+                {
+                    if(s[i+1]==m[s[i]])
+                    {
+                        string new_s=s.substr(0,i)+s.substr(i+2,len-i-2);
+                        return isValid(new_s);                        
+                    }
+                    else if(s[i+1]==')' || s[i+1]==']' || s[i+1]=='}')return false;
+                    
+
+                }
+            }
+            return false;
+        }
+
+        
+    }
+};
+
+方法三：使用栈
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> stack1;
+        for (int i=0; i<s.length(); i++) {
+            char ch = s[i];
+ 
+            if (ch=='(' || ch=='[' || ch=='{')
+                stack1.push(ch);
+ 
+            if (ch==')')
+            {
+                if(stack1.empty())return false;
+                else if(stack1.top()=='(') stack1.pop();
+                else return false;
+            }
+
+            if (ch==']')
+            {
+                if(stack1.empty())return false;
+                else if(stack1.top()=='[') stack1.pop();
+                else return false;
+            }
+            
+            if (ch=='}')
+            {
+                if(stack1.empty())return false;
+                else if(stack1.top()=='{') stack1.pop();
+                else return false;
+            }
+
+ 
+        } // for
+ 
+        if (!stack1.empty())
+            return false;
+ 
+        return true;
+    }
+};
+
+
+21.
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if(l1==NULL)return l2;
+        else if(l2==NULL)return l1;
+        else
+        {
+            ListNode* p1=l1;
+            ListNode* p2=l2;
+            
+            if(p1->val>p2->val)
+            {
+                ListNode* l3=new ListNode(p2->val);
+                //l3->val=p2->val;
+                l3->next=mergeTwoLists(p1,p2->next);
+                return l3;
+            }
+            else 
+            {
+                ListNode* l3=new ListNode(p1->val);
+                //l3->val=p1->val;
+                l3->next=mergeTwoLists(p1->next,p2);
+                return l3;
+            }
+        }
+
+        
+        
+        
+        
+    }
+};
+
+
+
+26
+
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        int len=nums.size();
+        if(len==0 || len==1)return len;
+        int left=nums[0];
+        for(int i=1;i<len;i++)
+        {
+            if(nums[i]==left)nums[i]=nums[0]-1;
+            else left=nums[i];
+        }
+        left=-1;
+        int right=-1;
+        for(int i=1;i<len;i++)
+        {
+            if(nums[i]==nums[0]-1)
+            {
+                if(left==-1)left=i;
+                right=i;
+            }
+            else
+            {
+                if(left!=-1)
+                {
+                    nums[left]=nums[i];
+                    nums[i]=-1;
+                    right+=1;
+                    left+=1;
+                }
+            }
+        }       
+        if(left==-1)return len;
+        else return left;
+        
+    }
+};
+
+
+上述方法的精简版:设定一个左右指标,根据是否保留某个数来更新left\right,时间空间复杂度都是O(1)
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        int len=nums.size();
+        if(len==0 || len==1)return len;
+        int left=-1;
+        int right=-1;
+        for(int i=1;i<len;i++)
+        {
+            if(nums[i]==nums[i-1])
+            {
+                if(left==-1)left=i;
+                right=i;
+            }
+            else
+            {
+                if(left!=-1)
+                {
+                    nums[left]=nums[i];
+                    right+=1;
+                    left+=1;
+                }
+            }
+        }       
+        if(left==-1)return len;
+        else return left;
+        
+    }
+};
+
+
+
+28、KMP算法
+慢的办法
+#include<iostream>
+
+using namespace std;
+
+int strStr(string haystack, string needle) {
+    int len=needle.size();
+    if(len==0)return 0;
+    int next[len];
+    next[0]=-1;
+    for(int i=1;i<len;i++)
+    {
+        int k=i-1;
+        next[i]=0;
+        while(k>0)
+        {
+            if(needle.substr(0,k)==needle.substr(i-k,k))
+            {
+                next[i]=k;
+                break;
+            }
+            k--;
+        }
+        
+    }
+
+    int id=0;
+    int k=0;
+    while(id!=len && k!=haystack.size())
+    {
+        if(needle[id]==haystack[k])
+        {
+            id++;
+            k++;
+        }
+        else
+        {
+            if(id==0)k++;
+            else id=next[id];
+        }
+    }
+    if(id==len)return k-id;
+    else return -1;
+
+    
+}
+
+int main()
+{
+    string haystack="aaaaaaaaaaaaaaaaaaaaa";
+    string needle="aaaaaaaaaaa";
+    cout<<strStr(haystack, needle)<<endl;
+    
+}
+
+
+标准算法：O(m+n)
+改进的地方是算next数组，参见https://blog.csdn.net/yutianzuijin/article/details/11954939/最下方的说明图！
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        int len=needle.size();
+        if(len==0)return 0;
+        int next[len];
+        next[0]=-1;
+        for(int i=1;i<len;i++)
+        {
+            int tmp=next[i-1];
+            while(needle[tmp]!=needle[i-1])
+            {
+                if(tmp==-1)break;
+                tmp=next[tmp];
+            }
+            next[i]=tmp+1;
+        }
+
+        int id=0;
+        int k=0;
+        while(id!=len && k!=haystack.size())
+        {
+            if(needle[id]==haystack[k])
+            {
+                id++;
+                k++;
+            }
+            else
+            {
+                if(id==0)k++;
+                else id=next[id];
+            }
+        }
+        if(id==len)return k-id;
+        else return -1;
+
+
+    }
+};
+
+
+36
+使用hash_map来判断数组中是否有重复元素
+
+#include<iostream>
+#include <unordered_map>
+using namespace std;
+
+int main()
+{
+    unordered_map<int, int> IntHash;  
+    IntHash[1] = 123;  
+    IntHash[2] = 456;  
+    int val = IntHash[1];  
+    cout<<val<<endl;
+}
+
+39.
+
+class Solution {
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        int first=candidates[0];
+        vector<vector<int>> ans;
+        if(candidates.size()==1)
+        {
+            if(target%first!=0)return ans;
+            else
+            {
+                vector<int> sub_ans;
+                for(int i=0;i<target/first;i++)
+                {
+                    sub_ans.push_back(first);
+                }
+                ans.push_back(sub_ans);
+                return ans;
+            }
+        }
+        else
+        {
+            vector<int> tail;
+            vector<int>::iterator iter=candidates.begin()+1;
+            while(iter!=candidates.end())
+            {
+                tail.push_back(*iter);
+                iter++;
+            }
+            ans=combinationSum(tail, target);
+            for(int num_first=1;num_first<=target/first;num_first++)
+            {
+                vector<int> head;
+                for(int i=0;i<num_first;i++)head.push_back(first);
+                int new_target=target-num_first*first;
+                if(new_target==0)ans.push_back(head);
+                else
+                {
+
+                    vector<vector<int>> sub_ans=combinationSum(tail, new_target);
+                    vector<vector<int>>::iterator tmp_iter=sub_ans.begin();
+                    while(tmp_iter!=sub_ans.end())
+                    {
+                        vector<int> tmp=head;
+                        vector<int>::iterator sub_tmp_iter=(*tmp_iter).begin();
+                        while(sub_tmp_iter!=(*tmp_iter).end())
+                        {
+                            tmp.push_back(*sub_tmp_iter);
+                            sub_tmp_iter++;
+                        }
+                        ans.push_back(tmp);
+                        tmp_iter++;
+                    }
+
+                }
+
+            }
+            return ans;            
+        }
+     
+    }
+};
+
+44.
+通配符的实现
+方法一：此方法时间复杂度很高，每次去掉最前面一位，递归
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int len_s=s.size();
+        int len_p=p.size();
+        if(len_s==0)
+        {
+            if(len_p==0)return true;
+            else
+            {
+                for(int i=0;i<len_p;i++)
+                {
+                    if(p[i]!='*')return false;
+                }
+                return true;
+            }
+        }
+        else
+        {
+            if(p[0]!='*' && p[0]!='?' && p[0]!=s[0])
+            {
+                return false;
+            }
+            else if(p[0]=='*')
+            {
+                string new_s=s.substr(1,len_s-1);
+                string new_p=p.substr(1,len_p-1);
+                return isMatch(new_s, p)||isMatch(new_s, new_p)||isMatch(s, new_p);
+            }
+            else 
+            {
+                string new_s=s.substr(1,len_s-1);
+                string new_p=p.substr(1,len_p-1);
+                return isMatch(new_s, new_p);
+            }
+        }
+        
+    }
+};
+
+
+方法二：将p按照*分开，逐个与s匹配
+
+45. 最小跳跃步数
+我的方法：最坏情况是O(n^2)
+class Solution(object):
+    def jump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        length=len(nums)
+        ans=[0]*length
+        if length<2:
+            return 0
+        
+        i=length-2
+        while i!=-1:
+            if nums[i]==0:
+                ans[i]=length
+            elif nums[i]+i>length-2:
+                ans[i]=1
+            else:
+                ans[i]=1+min(ans[i+1:i+nums[i]+1])
+            i-=1
+        
+        return ans[0] 
+
+参考答案：O(n)。。。。。没有理解
+class Solution(object):
+    def jump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        i,j,new_j = 0,0,0
+        count = 0
+        while j<len(nums)-1:
+            new_j = j+1
+            for k in range(i,j+1):
+                new_j = max(new_j,k+nums[k])
+            i = j+1
+            j = new_j
+            count += 1
+        return count 
+
+54.
+方案一：
+递归，O(nm)的时间复杂度，空间复杂度为O(m^1.5 *n^1.5)
+
+方案二：
+写一个函数，通过常数时间判断一个位置的下一个元素，O(nm)的时间复杂度和空间复杂度
+
+62、
+class Solution(object):
+    def uniquePaths(self, m, n):
+        """
+        :type m: int
+        :type n: int
+        :rtype: int
+        """
+        def C(n,k):
+            ans=1
+            for i in range(n-k+1,n+1):
+                ans*=i
+            for i in range(1,k+1):
+                ans/=i
+            return ans
+        return C(m-1+n-1,m-1)
+        
+63、把经过障碍点的情况去掉？对多个障碍效果不好
+使用动态规划法，注意深浅拷贝的问题
+class Solution(object):
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        """
+        :type obstacleGrid: List[List[int]]
+        :rtype: int
+        """
+        n=len(obstacleGrid[0])
+        m=len(obstacleGrid)
+        ans=copy.deepcopy(obstacleGrid)
+        for i in range(m-1,-1,-1):
+            for j in range(n-1,-1,-1):
+                ans[i][j]=0
+        if obstacleGrid[m-1][n-1]==1:
+            return 0
+        for i in range(m-1,-1,-1):
+            for j in range(n-1,-1,-1):
+                if i==m-1 and j==n-1:
+                    ans[i][j]=1
+                elif i==m-1:
+                    if obstacleGrid[i][j]!=1:
+                        ans[i][j]=ans[i][j+1]
+                elif j==n-1:
+                    if obstacleGrid[i][j]!=1:
+                        ans[i][j]=ans[i+1][j]
+                else:
+                    if obstacleGrid[i][j]!=1:
+                        ans[i][j]=ans[i+1][j]+ans[i][j+1]
+        return ans[0][0]
+
+69.
+使用牛顿法销量比较高，远快于O(n^0.5)
+class Solution(object):
+    def mySqrt(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        new=1.0*x
+        old=1.0*x
+        if x==new*new:
+            return int(new)
+        while (new-1)*(new-1)>=x:
+            new=old/2+x/(2*old)
+            old=new
+        if int(new)*int(new)>x:
+            return int(new)-1
+        else: return int(new)
+
+方法二：
+直接使用内置函数
+class Solution(object):
+    def mySqrt(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        ans=x**0.5
+        return int(ans)
+
+74.
+这个题不难，代码在本地可以通过，但线上无法通过，奇怪
+class Solution(object):
+    def searchMatrix(self, matrix, target):
+        """
+        :type matrix: List[List[int]]
+        :type target: int
+        :rtype: bool
+        """
+        if len(matrix)==0:
+            return False
+        elif len(matrix)==1:
+            if len(matrix[0])==0:
+                return False
+            elif len(matrix[0])==1:
+                return matrix[0][0]==target
+            else:
+                width=len(matrix[0])
+                if target<matrix[0][width/2]:
+                    return searchMatrix([matrix[0][:width/2]], target)
+                else:
+                    return searchMatrix([matrix[0][width/2:]], target)
+        else:
+            height=len(matrix)
+            if target<matrix[height/2][0]:
+                if height/2==0:
+                    return False
+                else:
+                    return searchMatrix(matrix[:height/2],target)
+            else:
+                return searchMatrix(matrix[height/2:], target)
+            
+75.
+class Solution(object):
+    def sortColors(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: void Do not return anything, modify nums in-place instead.
+        """
+        left=0
+        right=len(nums)-1
+        id=left
+        while id<=right:
+            if nums[id]==2:
+                nums[id],nums[right]=nums[right],nums[id]
+                right-=1
+
+            elif nums[id]==0:
+                nums[id],nums[left]=nums[left],nums[id]
+                left+=1
+                if id<left:
+                    id=left
+
+            else:
+                id+=1        
+
+80.
+class Solution(object):
+    def removeDuplicates(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        end=0
+        l=len(nums)
+        i=1
+        time=0
+        if l==0 or l==1 or l==2:
+            return l
+        else:
+            while i<l:
+                if nums[i]==nums[end]:
+                    if time==2:
+                        i+=1
+                    else:
+                        nums[end+1],nums[i]=nums[i],nums[end+1]
+                        end+=1
+                        time=2
+                        i+=1
+                else:
+                    nums[end+1],nums[i]=nums[i],nums[end+1]
+                    end+=1
+                    time=1
+                    i+=1
+        return end+1
+                
+
+
+84.
+给出一种O(n^2)复杂度的方法，超时了
+class Solution(object):
+    def largestRectangleArea(self, heights):
+        """
+        :type heights: List[int]
+        :rtype: int
+        """
+        
+        length=len(heights)
+        left=[]
+        right=[]
+        for i in range(length):
+            j=0
+            while i>=j and heights[i-j]>=heights[i]:
+                j+=1
+            left.append(j)
+            
+            k=0
+            while i+k<length and heights[i+k]>=heights[i]:
+                k+=1
+            right.append(k)
+            
+        width=[left[i]+right[i]-1 for i in range(length)]
+        size=[width[i]*heights[i] for i in range(length)]
+        
+        ans=0
+        for i in range(length):            
+            if ans<size[i]:
+                ans=size[i]
+        return ans
+
+下面是O(n)复杂度的方法
+
+
+87.
+class Solution(object):
+    def isScramble(self, s1, s2):
+        """
+        :type s1: str
+        :type s2: str
+        :rtype: bool
+        """
+        def issame(sa,sb):
+            if len(sa)!=len(sb):
+                return False
+            else:
+                l=len(sa)
+                for i in range(l):
+                    j=i
+                    while  j<l and sb[j]!=sa[i] :
+                        j+=1
+                    if j==l:
+                        return False
+                    elif i==j:
+                        sb=sb
+                    else:
+                        sb=sb[:i]+sb[j]+sb[i+1:j]+sb[i]+sb[j+1:]
+                return True
+            
+        if not issame(s1,s2):
+            return False
+        else:
+            l=len(s1)
+            if l==0:
+                return True
+            elif l==1:
+                return(s1==s2)
+            else:
+                for i in range(1,l):
+                    if self.isScramble(s1[:i],s2[:i]) and self.isScramble(s1[i:],s2[i:]):
+                        return True
+                    if self.isScramble(s1[:i],s2[l-i:]) and self.isScramble(s1[i:],s2[:l-i]):
+                        return True
+                return False
+                
+89.
+class Solution(object):
+    def grayCode(self, n):
+        """
+        :type n: int
+        :rtype: List[int]
+        """
+        if n==0:
+            return [0]
+        a=self.grayCode(n-1)
+        b=a[-1::-1]
+        c=[x+2**(n-1) for x in b]
+        ans=[]
+        for x in a:
+            ans.append(x)
+        for y in c:
+            ans.append(y)
+        return ans
+
+93.
+重新编写一个可递归函数
+def restoreIpAddresses(s,n):
+    l=len(s)
+    if l<n or l>3*n:
+        return False
+    elif n==1:
+        if int(s)>=0 and int(s)<=255:
+            return [[int(s)]]
+        else:
+            return False
+    else:
+        ans=[]
+        a1=int(s[-1])
+        s1=s[:-1]
+        if restoreIpAddresses(s1,n-1):
+            for x in restoreIpAddresses(s1,n-1):
+                x.append(a1)
+                ans.append(x)
+        a2 = int(s[-2:])
+        s2 = s[:-2]
+        if restoreIpAddresses(s2, n - 1):
+            for x in restoreIpAddresses(s2, n - 1):
+                x.append(a2)
+                ans.append(x)
+        a3 = int(s[-3:])
+        s3 = s[:-3]
+        if a3>=0 and a3<=255 and restoreIpAddresses(s3, n - 1):
+            for x in restoreIpAddresses(s3, n - 1):
+                x.append(a3)
+                ans.append(x)
+        return ans
+
+
+
+
+n=4
+s="5255111135"
+print(restoreIpAddresses(s,n))
+
+112.       
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def hasPathSum(self, root, sum):
+        """
+        :type root: TreeNode
+        :type sum: int
+        :rtype: bool
+        """
+        if root==None:
+            return False
+        elif root.left==None and root.right==None:
+            return root.val==sum
+        elif root.left==None:
+            return self.hasPathSum(root.right, sum-root.val)
+        elif root.right==None:
+            return self.hasPathSum(root.left, sum-root.val)
+        else:
+            return self.hasPathSum(root.right, sum-root.val) or self.hasPathSum(root.left, sum-root.val)
+        
+120,动态规划
+class Solution(object):
+    def minimumTotal(self, triangle):
+        """
+        :type triangle: List[List[int]]
+        :rtype: int
+        """
+        ans=triangle[-1]
+        rows=len(triangle)
+        if rows==0:
+            return 0
+        for i in range(rows-2,-1,-1):
+            for j in range(i+1):
+                ans[j]=triangle[i][j]+min(ans[j],ans[j+1])
+        return ans[0]
+        
+        
+121.
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        num=len(prices)
+        if num==0 or num==1:
+            return 0
+        ans=0
+        low=prices[0]
+        for x in prices:
+            if x<low:
+                low=x
+            elif x-low>ans:
+                ans=x-low
+        return ans
+        
+129.
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def sumNumbers(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if root==None:
+            return 0
+        if root.left==None and root.right==None:
+            return root.val
+        ans=0        
+        if root.left!=None:
+            root.left.val+=10*root.val
+            ans+=self.sumNumbers(root.left)
+        if root.right!=None:
+            root.right.val+=10*root.val
+            ans+=self.sumNumbers(root.right)
+        return ans
+            
+140.
+起初考虑递归，会出现指数次复杂度
+发现有很多重叠子问题，考虑从后往前使用动态规划
+
+
+145、
+class Solution:
+    def postorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        result = list()
+        if root == None:
+            return result
+
+        stack = list()
+        while stack or root:
+            if root:
+                stack.append(root)
+                result.insert(0, root.val)
+                root = root.right
+            else:
+                node = stack.pop()
+                root = node.left
+
+        return result

@@ -1,0 +1,18 @@
+##excute the following command one by one!! 
+
+cd img_h5_file
+ls *xml >../ img_label_list     注意：ls参数不能太多，否则会报错，此时需要最下面的vim命令:g/text/d。
+vi ../tmp
+
+:%s/^/\/home\/chencheng\/data\/
+:x
+cat tmp  |awk '{print $1,$1}' > img_label_list
+vi img_label_list
+:%s/xml /jpg	/
+rm tmp
+
+
+
+:g/text/d
+用 :g 。它的工作原理是在全文中搜索字串，然后在匹配的行上执行一个命令。命令的格式是 “g/搜索的正则表达式/要执行的命令”如果是删除的话，用 :d 这个命令。
+

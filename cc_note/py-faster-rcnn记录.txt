@@ -1,0 +1,117 @@
+1: github 下载py-faster-rcnn并编译成功
+
+2:枪支检测 修改源文件 小型网络ZF end2end(VGG_1024效果好 lr=0.001,stepsize=10000)
+
+问题：类别数和标签名称不同，需修改
+（1） /home/caojingjing/py-faster-rcn2/models/pascal_voc/ZF/faster_rcnn_end2end
+
+solver.prototxt test.prototxt train.prototxt 类别等进行修改，stepsize=10000
+train:3处21，1处84
+test：1处21，1处84
+
+
+ （2）/home/caojingjing/py-faster-rcnn/lib/datasets/pascal_voc.py
+
+类pascal_voc
+        self._classes = ('__background__', # always index 0
+                         '56', '81', '92p', '95', 'ak47', 'revolver')#换成自己的类别标签
+demo修改：
+class，model位置，数据位置，新建result目录
+
+报错：标记框坐标有0
+ (1)/lib/datasets/pascal_voc.py下函数_load_pascal_annotation，204行改成
+
+            x1 = float(bbox.find('xmin').text)
+            y1 = float(bbox.find('ymin').text)
+            x2 = float(bbox.find('xmax').text)
+            y2 = float(bbox.find('ymax').text)
+
+ (2) /py-faster-rcnn/lib/datasets/imdb.py
+ 函数 append_flipped_images
+	  boxes[:, 2] = widths[i] - oldx1 - 1
+	    for b in range(len(boxes)):
+  		if boxes[b][2]< boxes[b][0]:
+    		    boxes[b][0] = 0
+（3）修改lib/fast_rcnn/config.py，不使图片实现翻转
+	# Use horizontally-flipped images during training?
+	__C.TRAIN.USE_FLIPPED = False
+
+
+报错：roidb[i]['image'] = imdb.image_path_at(i)
+IndexError: list index out of range。
+
+到fast-rcnn-master/data/cache/删掉原来的pkl文件。
+
+
+报错：TypeError: 'numpy.float64' object cannot be interpreted as an index
+原因：np版本问题
+
+ (1) /py-faster-rcnn/lib/roi_data_layer/minibatch.py
+
+将第26行：fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image)
+改为：        fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image).astype(np.int)
+
+ (2) /home/xxx/py-faster-rcnn/lib/datasets/ds_utils.py
+
+将第12行：hashes = np.round(boxes * scale).dot(v)
+改为：hashes = np.round(boxes * scale).dot(v).astype(np.int)
+
+ (3) /home/xxx/py-faster-rcnn/lib/fast_rcnn/test.py
+
+将第129行： hashes = np.round(blobs['rois'] * cfg.DEDUP_BOXES).dot(v)
+改为： hashes = np.round(blobs['rois'] * cfg.DEDUP_BOXES).dot(v).astype(np.int)
+
+  (4) /home/xxx/py-faster-rcnn/lib/rpn/proposal_target_layer.py
+
+将第60行：fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image)
+改为：fg_rois_per_image = np.round(cfg.TRAIN.FG_FRACTION * rois_per_image).astype(np.int)
+在复现标准py-R-FCN的时候也遇到了这个问题。按上述（4）改动即可。
+
+报错：TypeError: slice indices must be integers or None or have an __index__ method
+
+/home/lzx/py-faster-rcnn/lib/rpn/proposal_target_layer.py，转到123行：
+将
+for ind in inds:
+        cls = clss[ind]
+        start = 4 * cls
+        end = start + 4
+        bbox_targets[ind, start:end] = bbox_target_data[ind, 1:]
+        bbox_inside_weights[ind, start:end] = cfg.TRAIN.BBOX_INSIDE_WEIGHTS
+    return bbox_targets, bbox_inside_weights
+改为
+for ind in inds:
+        ind = int(ind)
+        cls = clss[ind]
+        start = int(4 * cls)
+        end = int(start + 4)
+        bbox_targets[ind, start:end] = bbox_target_data[ind, 1:]
+        bbox_inside_weights[ind, start:end] = cfg.TRAIN.BBOX_INSIDE_WEIGHTS
+    return bbox_targets, bbox_inside_weights
+
+该文件164、175行也要int化？？
+
+异物检测：(ZF)
+/home/caojingjing/py-faster-rcnn/lib/fast_rcnn/config.py
+
+# Overlap threshold used for non-maximum suppression (suppress boxes with
+# IoU >= this threshold)
+__C.TEST.NMS = 0.3改为0.1
+
+
+
+
+
+
+
+
+编译py生成pyc文件：
+python
+
+>>>import py_compile
+
+>>>py_compile.compile(r'config.py')
+
+
+#!/usr/bin/env python
+#coding=utf8
+# 代码中加中文注释，开头写上这行用于指定编码 

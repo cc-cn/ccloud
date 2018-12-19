@@ -1,0 +1,17 @@
+脚本开机启动:将要执行的脚本移到指定位置,这个位置的文件会在开机时自动执行.详见 https://www.cnblogs.com/wjyHIT2011/articles/6800089.html
+
+应用程序开机自启动:
+方法1:在/usr/share/applications/下面找到你要添加的开机启动程序的.desktop文件，然后把它复制到你home目录下的.config/autostart/目录下面，如果没有autostart目录就自己创建，这样就可以了.在home目录启动时,如果用其他的用户登陆,如果其他的用户没有设置就不能自动登陆了,如果要所有用户都自动登陆,可以在/etc/xdg/autostart目录下写个.desktop文件即可,你也可以将/usr/share/applications目录下的你要启动的.desktop文件方法到这个目录下,就能达到所有用户都可以自动启动应用程序了.
+
+方法2:在终端中执行gnome-session-properties,会弹出一个“启动应用程序首选项”的菜单，如果
+
+点击添加会弹出下面的这个对话框：
+
+在名称中写入要启动应用的名字，命令是这个应用的可执行程序的位置，一般的可执行程序都在/usr/bin目录下。注释可写可不写 
+例如
+add-Name(Dropbox)-Command(/home/chencheng/.dropbox-dist/dropboxd)
+
+方法三：直接在/etc/rc.local中添加要启动的命令
+例如开机连接vps命令： sslocal -s 172.96.209.207 -p 443 -k "NzE3ODM3Nm" -b 127.0.0.1 -l 1080
+
+

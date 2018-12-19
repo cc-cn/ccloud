@@ -1,0 +1,51 @@
+在mac上学习使用docker的记录
+参见：https://docs.docker.com/docker-for-mac/
+
+先安装docker：https://docs.docker.com/docker-for-mac/install/
+
+Start a Dockerized web server：（image名字为nginx）
+docker run -d -p 80:80 --name webserver nginx
+然后打开网址：127.0.0.1:80
+
+View the details on the container while your web server is running ：docker container ls
+
+
+列出所以容器，包括未运行的：docker container ls -a
+停止容器：docker container stop webserver
+移除容器：docker container rm webserver
+列出镜像：docker image ls
+移除镜像：docker image rm nginx
+容器和镜像之间的关系参见：https://blog.csdn.net/vchy_zhao/article/details/70239585
+
+下面在docker中运行一个轻量级的linux发行版
+参照https://github.com/docker/labs/blob/master/beginner/chapters/alpine.md
+创建镜像：docker pull alpine
+运行docker里的命令：docker run alpine ls -l
+运行docker里的命令：run alpine echo "hello from alpine"
+
+进入alpine命令行：docker run -it alpine /bin/sh 或 docker run -it alpine（第二种方法使用默认的shell）
+进入之后可以使用一般的linux命令，如查看发行版本cat /etc/issue，内核uname -a ，cpu线程数cat /pro/cpuinfo | grep processor
+退出：exit，容器关闭
+
+注意，至此仍没有container在运行，可以用上面命令自行验证
+可以使用docker ps -a查看 a list of all containers that you ran
+
+在docker中运行ubuntu14
+搜索可用的镜像：docker search ubuntu | grep 14
+根据上面输出结果，选一个star多的
+安装：docker pull ansible/ubuntu14.04-ansible （这一步要下载大约300M文件）
+############
+运行container：docker run -it  ansible/ubuntu14.04-ansible（进入退出非常快，且硬件共享，这是docker相比虚拟机和双系统的优势）
+退出容器之后，所所编辑过的文件，安装过的软件都会消失。所以在退出之前要先commit一个新的镜像：docker commit CONTAINER_ID new_image:new_tag
+CONTAINER_ID是编辑过的容器id，可以通过docker ps
+这样就产生了一个新的镜像，运行新镜像：docker run -it new_image:new_tag，new_tag若不加则使用默认的latest
+使用docker rmi -f image_name移除一个旧镜像
+
+这个网址存了很多镜像：https://store.docker.com/
+
+本地和docker容器中传输文件：docker cp file.txt cranky_shtern:/root
+cranky_shtern是容器名，这个命令要在主系统下执行。
+
+至此，已了解docker原理
+除了上述以外，还可以自己制作镜像，供各个平台传播使用，以后用到再查。
+

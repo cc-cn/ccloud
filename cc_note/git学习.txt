@@ -1,8 +1,10 @@
 https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/0013743256916071d599b3aed534aaab22a0db6c4e07fd0000
 
 
-email: chchnhu@163.com
+email: chchnju@163.com
 user_name:chencheng
+https://github.com/cc-cn
+
 
 
 step
@@ -19,7 +21,7 @@ git diff example.txt  提交之前，查看具体被修改了哪些地方
 
 git log查看历史版本
 
-git reset --hard HEAD^回到上一个版本，等价于git reset --hard HEAD~1  如果有多个文件不太好办啊啊？？
+git reset --hard HEAD^回到上一个版本（最常用），等价于git reset --hard HEAD~1 
 git reset --hard HEAD^^回到上上一个版本，等价于git reset --hard HEAD~2
 以此类推
 
@@ -36,25 +38,30 @@ git commit -m "remove test.txt"
 
 如果上面第一步是误删，则在第一步后使用git checkout -- test.txt恢复文件。（因为此时文件还在版本库里）
 
+
 创建远程仓库（即github），参见最上面网页的远程控制部分。这部分的意义是让github认识你的本地机器，以防别人随便修改。因此如果有多台机器，都要配置一下。。那在临时机器上岂不是不能上传git。。。
 
 建立本地和远程的连接：
-git remote add origin git@github.com:michaelliao/learngit.git
-git -u push origin master （-u参数只在第一次连接时用到，以后上传时只要$ git push origin master）
+git remote add origin git@github.com:cc-cn/ccloud.git
+git -u push origin master （-u参数只在第一次连接时用到，以后上传时只要提交，然后$ git push origin master）
 
-从云端克隆到本地，得到一个名为cc_git的文件夹。  如果本地有这个文件夹的旧版本，怎么同步更新呢？？
+从云端克隆到本地，得到一个名为ccloud的responsibility。  如果本地有这个文件夹的旧版本，怎么同步更新呢？？
 git clone git@github.com:cc-cn/cc_git.git
 
+查看本地仓库与远程仓库的关联详情
+$ git remote -v
 
+解除远程仓库
+$ git remote rm origin
 
 
 常用命令总结：
 每次修改之后要：git add --all
 然后提交： git commit -m "dosomethon"
-上传： sudo git push origin master  （教程上不用加sudo，但公司台式机上要加才能运行。）
+上传：git push origin master  （教程上不用加sudo，但公司台式机上要加才能运行。）
 
-from hyy
-云端的更新同步到本地：git pull
+
+云端的更新同步到本地：git pull origin master  
 不需要sudo
 注意：如果云端和本地都更新了，pull或push会有问题。最好是修改之前先确保本地和云端是同一版本
 

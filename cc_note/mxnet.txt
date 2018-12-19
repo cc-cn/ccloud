@@ -1,0 +1,140 @@
+复现mxnet ssd
+#目标mAP=76%
+#http://mxnet.incubator.apache.org/get_started/install.html这里可以选择pip安装、源码安装等多种方式。一般源码安装比较好，方便使用。
+
+#github代码
+https://github.com/zhreshold/mxnet-ssd
+git clone --recursive https://github.com/zhreshold/mxnet-ssd.git
+
+cd mxnet-ssd/mxnet
+
+cp make/config.mk ./config.mk
+
+
+
+#build 参数也可以在config.mk里改，如果需要的包都装好了，可以直接编译。通常都安装好了，详见http://mxnet.incubator.apache.org/get_started/install.html源码方式安装。
+
+make -j20 USE_OPENCV=1 USE_BLAS=atlas USE_CUDA=1 USE_CUDA_PATH=/usr/local/cuda USE_CUDNN=1 USE_CPP_PACKAGE=1 CUDA_ARCH="-gencode arch=compute_61,code=sm_61 -gencode arch=compute_61,code=compute_61"
+
+mxnet编译指令。其中compute_61 是针对1070\1080\1080ti\titan显卡的。到wiki cuda 上查一下对应的cuda_arch，如果不加这个参数的话，会遍历几种情况，编译慢。
+
+USE_CPP_PACKAGE=1  #这个可以不加，c++接口
+
+
+#bug and debug
+
+问题：/usr/bin/ld -lippicv not found
+http://blog.csdn.net/kaka20080622/article/details/51075608
+
+问题：ImportError: No module named builtins
+这是python3中的模块，执行：pip install future 即可
+
+问题：20 epoch开始，训练变慢了，原因是需要清理缓存。
+输入
+sudo su -c "sync; echo 1 > /proc/sys/vm/drop_caches"
+sudo su -c "sync; echo 2 > /proc/sys/vm/drop_caches"
+
+
+
+
+
+
+
+生成数据，并按指定名称、放到指定位置之后
+执行训练脚本：python train.py --gpus 0,1,2,3 --batch-size 128 --lr 0.001
+下面从这个脚本入手，修改适合自己的脚本。
+
+志成的建议：
+先看ssd部分、再看mxnet部分、修改多少个echo开始测试、写网络。
+
+调用的数据由tools/prepare_pascal.sh生成，该脚本调用了VOCdevkit数据。可以修改成调用train_img_label形式。
+
+val.idx：对应编号id，，？
+val.lst：存label
+val.rec：存图片
+
+symbol含义：网络结构
+
+测一下官网给的几个训练好的模型的accuracy
+之后分别复现一下
+
+
+
+
+
+mxnet试试几组参数
+lr=0.004，batch32
+caffe-ssd在pascalvoc上使用的参数照搬过来。
+
+看看生成的json文件存在哪里了
+测试一下生成的params，并保存xml文件。用matlab版本的测试脚本测一下。
+
+
+
+
+
+train.py脚本分析：
+
+parser.add_argument('--resume', dest='resume', type=int, default=-1,
+                        help='resume training from epoch n')
+这个参数如果大于0，则是从resume这个整数对应的checkpoint开始训练。
+
+parser.add_argument('--finetune', dest='finetune', type=int, default=-1,
+                        help='finetune from epoch n, rename the model before doing this')
+这个参数如果大于0，则是从finetune这个整数对应的checkpoint开始训练。
+
+parser.add_argument('--pretrained', dest='pretrained', help='pretrained model prefix',
+                        default=os.path.join(os.getcwd(), 'model', 'ssd_300'), type=str)
+parser.add_argument('--epoch', dest='epoch', help='epoch of pretrained model',
+                        default=0, type=int)
+这两个参数了决定了用~/mxnet-ssd/model/下的 ssd_300-0000.params和ssd_300-symbol.json做pretrain，前者相当于model，后者相当于prototxt。
+
+--lr-steps到了这个epoch自动改变lr
+
+哪里可以设置anchor_box?
+对比caffe mxnet采用的ssd参数。（pascal数据集）
+
+
+
+evaluate.py脚本分析：
+最重要的三个参数：--network， --epoch， --data-shape分别取resnet50， 0， 512的话，意味着被测试的model是在~/mxnet-ssd/model的ssd_resnet50_512-0000.params、ssd_resnet50_512-symbol.json。
+经测试，这个model的mAP=77.8%，官网宣称的是78.9%
+python evaluate.py --gpus 2,3 --network inceptionv3 --data-shape 512 --batch-size 16 --epoch 0测试结果是mAP=77.0%,官网宣称的是78.9%(需要事先把ssd_inceptionv3_512-0000.params，ssd_inceptionv3_512-symbol.json拷贝到相应目录下)我自己复现的mAP=77.3%
+
+
+与caffe不同的是，这里的network必须是已经定义的网络。而caffe测试的时候只要有model和prototxt即可。因此这里的模型名称也很有讲究，不能随便取名字。这样很不方便，看看能不能优化一下接口。
+
+
+/home/chencheng/server2/mxnet-ssd/train/train_net.py   line237，epoch_end_callback
+上述epoch_end_callback是存储model的周期（默认１个epoch存一次），，哪里可以设定多少个ｅｐｏｃｈ测一次呢？？
+
+
+symbol文件夹是关于定义网络的。示例有vgg16_reduced，inceptionv3，resnet50，resnet101，mobilenet  //定义在/home/chencheng/mxnet-ssd/symbol/symbol_factory.py
+
+
+
+
+voc官方计算mAP脚本，官方数据集附带脚本VOCcode，这是.m文件，可以将训练好的model生成.xml文件，作为输入。就可以算mAP了。（服务器上装matlab比较大，可以在win本上测。）
+mxnet-ssd/detect/detector.py可以保存测试结果，可视化。
+mxnet-ssd/evaluate/eval_voc.py是另一个可以计算mAP的脚本，需要现有上面的测试结果。
+
+
+
+
+
+
+我写了一个mxnet-ssd测试脚本，运行命令如下
+cd ~/mxnet-ssd/jobs/pascal_voc/vgg16_reduced
+python test.py --network vgg16_reduced --epoch 164 --prefix /home/chencheng/mxnet-ssd/jobs/pascal_voc/vgg16_reduced/model/ssd_ --data-shape 300 --gpu 1
+会在output文件里保存每一类的检测结果
+然后
+python myeval_voc.py
+会算出mAP
+resnet50官方宣称是78.9%,但是我用官方evaluate.py脚本测得是77.8%,自己写的myeval_voc.py算出来是80.7%  比较一下这两个测试方法
+
+
+
+
+
+
+

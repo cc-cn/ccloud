@@ -1,0 +1,44 @@
+
+私有云：数据存储在本地，其他地方想访问的时候通过网络来访问。网络速度不受限制，数据相对安全。
+公有云：数据存储在云端，即公有云提供商的服务器里，其他地方想访问的时候通过网络来访问。此网络可能被限速。数据可能丢失，泄露。
+
+
+
+网络通信协议分层
+应用层：
+
+		HTTP（Hypertext Transfer Protocol 超文本传输协议，显示网页）
+		DNS（Domain Name System）
+		FTP（File Transfer Protocol）
+		SFTP（SSH File Transfer Protocol，和FTP不一样）
+		SCP（Secure copy，based on SSH）
+		SSH （Secure Shell）
+
+
+通信层：
+
+		TCP（Transmission Control Protocol 三次握手传输协议）
+		UDP
+
+网络层：
+
+		IP（Internet Protocol）
+		ICMP（Internet Control Message Protocol，主要用于路由发送错误报告）
+
+链接层：
+
+		MAC（media access control）
+
+
+
+三种文件传输协议比较：
+FTP 基于TCP来传输文件，明文传输用户信息和数据。速度快
+SFTP 基于SSH来加密传输文件，可靠性高，可断点续传。
+SCP 是基于SSH来加密拷贝文件，但要知道详细目录，不可断点续传。
+
+ubuntu下FTP服务器配置：https://www.linuxidc.com/Linux/2016-12/138563.htm
+
+win下配置自带FTP服务器：https://jingyan.baidu.com/article/574c5219d466c36c8d9dc138.html
+也可使用Winscp
+
+原理很简单，通过ip、端口实现远程传输。FTP无需数据加密，所以更快。适合团体内大文件、不重要文件的共享。如校园、电影。个人使用没必要配置FTP。一来资源少，云盘、移动硬盘或scp可以解决；二来自己的电脑不是一直开着的，这样就无法提供FTP服务。

@@ -1,0 +1,30 @@
+本文档实现将可执行文件加入到应用程序快捷方式
+
+以dropbox为例
+
+sudo gedit /usr/share/applications/Dropbox.desktop
+#?有可能要为其赋予可执行权限,没尝试
+
+在打开的文件中写入:
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Categories=Network;
+Name=Dropbox
+Comment=Dropbox
+Exec=sh /home/chencheng/.dropbox-dist/dropboxd
+Icon=/home/chencheng/Desktop/Dropbox/dropbox.png
+
+
+解释:
+Terminal=false #不在命令行打开
+Exec=sh /home/chencheng/.dropbox-dist/dropboxd  #可执行文件路径
+Icon=/home/chencheng/Desktop/Dropbox/dropbox.png  #快捷方式图标路径,从官网截图来的
+
+这样就能从应用程序中找到该快捷方式了
+
+
+

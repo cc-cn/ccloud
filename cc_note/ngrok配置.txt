@@ -1,0 +1,44 @@
+ngrok配置
+在没有公网ip的情况下从外网访问ubuntu主机
+参见https://www.zhihu.com/question/27771692
+官网https://dashboard.ngrok.com/get-started
+0、确保安装了open-ssh
+1、注册
+163+paoer。。。333
+2、下载，解压执行文件：unzip /path/to/ngrok.zip
+3、获取authtoken
+4、运行./ngrok tcp 22
+可得如下信息(每次产生的端口号可能不一样)
+Forwarding      tcp://0.tcp.ngrok.io:18180 -> localhost:22
+
+
+使用：
+ngrok:ssh chencheng@0.tcp.ngrok.io -p18180
+scp -P 18180 chencheng@0.tcp.ngrok.io:/home/chencheng/123.py ./
+sshfs chencheng@0.tcp.ngrok.io:/home/chencheng/ /Users/ccmac/123/ -p28391
+
+发现这个软件的服务器在国外，且比vps网速还慢。
+
+ngrok我记得githut上有源码，自己在国内服务器上建个同样的服务，不就可以了吗？
+参考：http://yangbingdong.com/2017/self-hosted-build-ngrok-server/
+这个方法看着挺靠谱的，不过要购买域名。9$
+
+我想到的办法：
+先连上vps，再从vps连ngrok
+实测速度：稍稍快一点，还是不理想
+问题：远程copy，挂载不太方便
+
+
+
+
+远程控制家里电脑的方法
+openconnect(版本号＞=7.05)：openconnect --juniper https://vpn.pku.edu.cn
+7.07版后，可用以下写法代替：openconnect --protocol=nc https://vpn.pku.edu.cn
+接着输入yes-1401110011-cc276951
+
+这样即可在学校访问家里的电脑（针对这种方式容易掉线的情况，可以同时连个ngrok？）
+或试试这个方法：
+https://bbs.pku.edu.cn/v2/post-read.php?bid=13&threadid=16416863
+
+
+

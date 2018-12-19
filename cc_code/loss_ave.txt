@@ -1,0 +1,19 @@
+#首先通过命令tail -1000 logs/log1 | grep accuracy > small_acc  获取accuracy或其它感兴趣的值,并存入small_acc文档。
+#下面的python函数实现了计算上述所的acc的平均值。
+
+
+
+import numpy as np
+f=open('small_acc','r')
+lines=f.readlines()
+
+acc=[]
+for line in lines:
+        line=line.strip().split()
+        if(len(line)>0):
+                #print(line[-1])
+                acc.append(float(line[-1]))
+ans=np.mean(np.array(acc))
+print(ans)
+
+f.close()

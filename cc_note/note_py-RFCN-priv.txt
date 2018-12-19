@@ -1,0 +1,16 @@
+前提：环境中已经成功运行caffe(即ssd)，以及py-R-FCN-multiGPU
+
+
+git clone https://github.com/soeaver/py-RFCN-priv
+
+进入py-RFCN-priv/lib, make
+
+cd $RFCN_ROOT/caffe-priv
+
+cp ~/caffe/Makefile.config ./
+
+类似于py-R-FCN-multiGPU，在Makefile.config文件中加入USE_NCCL := 1
+
+修改.bashrc，类似于py-R-FCN-multiGPU，加入nccl相关路径
+make all -j20 && make pycaffe -j20
+

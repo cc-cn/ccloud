@@ -1,0 +1,72 @@
+array:
+定长，
+array<int,5> myarray={4,5,6,7};
+成员函数：
+[],at,begin,end,size,max_size,empty,back,front
+
+deque:
+双端队列
+顺序、双端可变长存储
+存储空间不连续！常数时间读取元素，操作很vector很像
+mydeque.push_back(i);
+deque<int>::iterator it = mydeque.begin();
+mydeque.size()
+mydeque.push_front(-1);
+it = mydeque.insert (it,10);//it指向的位置插入10，后面的数字一次后移一位;it指向新插入的值
+it = mydeque.insert (it,3,10);//it指向的位置插入3个10，后面的数字一次后移三位
+
+
+forward_list:
+序列存储，常数时间插入删除，基于单向链表；缺点是线性时间访问，没有size函数
+
+list：
+基于双向链表；缺点是线性时间访问；
+list<string> mylist;
+mylist.sort();
+
+map：
+map中的元素按照key自动排序，基于红黑树存储，便于高效查找
+map<char,int> mymap;
+mymap['b'] = 100;
+mymap['a'] = 200;
+map<char,int>::iterator it=mymap.begin();//it->first等于'a',it->second等于200
+
+multimap：
+允许有相同的key，其它地方和map差不多
+
+queue：
+队列
+先进先出的单向链表，不支持访问内部元素！！
+queue<int> myints;
+myints.size()
+myints.push(1);
+myints.pop();//去掉第一个元素
+myints.front()
+myints.back()
+
+stack:
+栈，先进后出
+成员函数 top, size, push, pop
+
+set：
+没有重复元素，自动排序
+set中元素不能被修改，但能被移除
+和其它容器一样，需要先 #include <set>
+int myints[] = {75,23,65,42,13};
+set<int> myset (myints,myints+5);//构造函数
+set<int>::iterator it=myset.begin();
+myints.insert(1);
+myints.size();//常数时间复杂度
+it=myset.find(20);//如果20不在set里则会随机返回一个地址，导致下面可能出错，建议先myset.count(20)一下;
+myset.erase (it);//删除元素
+myset.count(i);//如果i在set里，则返回1；否则0
+
+vector:
+可变长顺序容器，连续存储（因此可通过下标访问、插入删除开销大）
+当存储的数据超过max_size时会重新分配空间，这一开销很大
+成员函数：
+[],at,begin,end,size,max_size,capcity,empty,front,back,push_back,pop_back,insert,clear
+
+
+
+
