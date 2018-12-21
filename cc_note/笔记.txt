@@ -347,6 +347,11 @@ TAR
 解压：rar x FileName.rar
 压缩：rar a FileName.rar DirName 
 
+.7z
+解压：7z x file.7z
+压缩：7z a -t7z -r file.7z file/*
+sudo apt-get install p7zip-full
+
 解压远比压缩快。小图压缩之后传输速度大大加快。总的来说，超过10G的图片可以考虑先压缩再传输。
 
 tee
