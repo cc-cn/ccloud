@@ -1,5 +1,5 @@
 # Python
-#这段代码给出了使用不同方式计算数组只和等效率
+#这段代码给出了使用不同方式计算数组只和的效率
 import time
 import tensorflow as tf
 

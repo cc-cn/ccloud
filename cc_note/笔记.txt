@@ -1,13 +1,3 @@
-
-家里台式机挂载移动硬盘：
-sudo mount -t ntfs /dev/sdc3 /media/cdrom/hdd3
-sudo umount /media/cdrom/hdd3
-
-sslocal -s 172.96.209.207 -p 443 -k "NzE3ODM3Nm" -b 127.0.0.1 -l 1080
-
-ngrok:ssh chencheng@0.tcp.ngrok.io -p18180
-scp -P 18180 chencheng@0.tcp.ngrok.io:/home/chencheng/123.py ./
-
 黑客涉及到的知识非常广泛，主要是web、数据库、linux、python、c++等等
 具体参见https://zhuanlan.zhihu.com/p/22304241
 
@@ -21,38 +11,6 @@ caffe提供命令行接口、python接口、matlab接口。分别在caffe/build/
 例如https://github.com/rbgirshick/py-faster-rcnn/blob/master/models/pascal_voc/VGG16/faster_rcnn_end2end/train.prototxt
 调用了https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/rpn/proposal_layer.py（训练的时候使用nms）
 
-ubuntu命令行外网问题:Unable to determine SOCKS version from socks://127.0.0.1:1080/
-使用如下命令:
-all_proxy=socks5://127.0.0.1:1080/;ALL_PROXY=socks5://127.0.0.1:1080/ 
-
-python3+cv3无法使用imshow,需进入python2环境
-
-git clone --recursive
-
-运行cuda程序
-nvcc -o abc 123.cu
-./abc
-
-在Python3以后，字符串和bytes类型彻底分开了。字符串是以字符为单位进行处理的，bytes类型是以字节为单位处理
-详见：https://www.cnblogs.com/R-bear/p/7744454.html
-
-
-from PIL import Image
-import matplotlib.pyplot as plt
-image = Image.open(img_dir)
-plt.imshow(image)
-plt.show()
-
-
-
-a=[1,2,3,4,5]
-b=[3,4,5,6,7,8]
-c=[x for x in a and for x in b]???error
-//[v for v in a if v in b]
-
-
-ubuntu局部截屏:gnome-screenshot -a
-我在 设置-键盘-快捷键-自定义快捷键中将该命令设置了快捷键:Alt-Shift-4
 
 pytorch计算图是靠Variable实现得到的,普通计算是靠tensor实现.Variable可自动计算梯度.
 
@@ -60,52 +18,12 @@ jupyter-notebook更改变量值之后,前面出现的变量值也相应更改.
 
 caffe LayerParameter类定义在:.build_release/src/caffe/proto/caffe.pb.h
 
-dpkg -l 查看已安装的软件
-sudo apt-get remove wechat删除软件
-sudo apt-get --purge remove wechat强制删除软件及相关依赖
 
-if [ -z "$1" ]//判断是否存在第一个参数，如果不存在，返回True
-类似这样的文件操作在shell编程中用处很大：我总结有一些一些经常使用
-－d ：判断制定的是否为目录
-－z：判断制定的变量是否存在值
-－f：判断制定的是否为文件
-－L:判断制定的是否为符号链接
-－r：判断制定的是否可读
-－s:判断存在的对象长度是否为0
-－w:判断制定的是否可写
-－x：判断存在的对象是否可以执行
-！：测试条件的否定符号
-这些文件操作很多时候给脚本编程带来方便，尤其是用在if条件语句中
 
-sed用法总结：http://man.linuxde.net/sed
-sed是对行进行操作的，将操作结果显示出来，不会改变源文件。需要通过重定向方式保存。
-替换字段：sed 's/old/new/' file.txt
-全局替换字段：sed 's/old/new/g' file.txt
-删除空行:sed '/^$/d' file.txt  (^表示行首，$表示行尾)
-行首插入字段：sed 's/^/add/' file.txt
-删除文件的第2行:sed '2d' file
-删除文件的第2到20行:sed '2,20d' file
-删除文件的第2行到末尾所有行：sed '2,$d' file
-删除文件中所有开头是test的行：sed '/^test/'d file
-删除文件中所有含有test的行：sed '/test/'d file
 
-cut 用于安某个字符分割文本
-cut  -d: -f2 file   将文本file中的内容按：分割，并显示第二列。 
+ 
 
-vim命令模式下：yy表示复制当前行，p表示粘贴，6yy表示复制6行。del表示向后删除一个字母，/word表示查找word, :!command表示执行一个系统命令conmand。:sh返回到命令行，按ctrl+d切换回vim.
-locate file 命令可以查找文件
-优点是速度快，缺点是一些新的文件找不到，除非先updatedb一下，刷新数据库。
-find命令功能多，但速度慢。
 
-gzip src.pdf压缩
-zip goal.zip src.pdf
-unzip goal.zip 解压和压缩都会保留原来的文件
-
-tar -cvf goal.tar src_file归档，把文件放一块，not 压缩，不会节约空间
-tar -xvf goal.tar  释放归档
-tar -cvzf goal.tar.gz src_file 归档并压缩
-tar -xvzf file.tar.gz
-利用移动硬盘转移数据的时候，压缩一下是非常必要的。这样可以利用计算机的性能优势弥补移动硬盘的不足。
 
 如何用jupyter打开远程服务器上的文件？
 conda安装jupyter：conda install jupyter
@@ -302,65 +220,8 @@ c++调用python则比较麻烦，   http://www.cnblogs.com/jason2004/p/6182988.h
 
 str.isdigit() 判断字符串是否是由纯数字构成。如果是float则比较麻烦，不知道是否有好办法？
 
-shell脚本中if语句示例：
-if [ "$a" -eq "$b" ]  #注意中括号两边的空格不可省略。
-then
-...
-else
-...
-fi
-
-if [ "$a" -eq 1 ]
-then
-...
-else
-...
-fi
 
 
-.gz
-解压1：gunzip FileName.gz
-解压2：gzip -d FileName.gz
-压缩：gzip FileName
-----------------------------------------------
-.tar.gz
-解压：tar zxvf FileName.tar.gz
-压缩：tar zcvf FileName.tar.gz DirName
----------------------------------------------
-TAR
-解包： tar -xvf archive_name.tar.gz
-压缩： tar -cvf archive_name.tar directory_to_compress
-----------------------------------------------
-.tgz
-解压：tar zxvf FileName.tgz
-压缩：未知
-----------------------------------------------
-.tar.tgz
-解压：tar zxvf FileName.tar.tgz
-压缩：tar zcvf FileName.tar.tgz FileName
----------------------------------------------
-.zip
-解压：unzip FileName.zip
-压缩：zip FileName.zip DirName
----------------------------------------------
-.rar
-解压：rar x FileName.rar
-压缩：rar a FileName.rar DirName 
-
-.7z
-解压：7z x file.7z
-压缩：7z a -t7z -r file.7z file/*
-sudo apt-get install p7zip-full
-
-解压远比压缩快。小图压缩之后传输速度大大加快。总的来说，超过10G的图片可以考虑先压缩再传输。
-
-tee
-命令：既把输出保存到文件中，又在屏幕上看到输出内容
-例子
-ls | tee file//覆盖
-ls | tee -a file   //追加
-把标准错误也被tee读取
-ls *.jpg 2>&1 | tee ls.txt 
 
 sys.exit()通常用在主程序
 os._exit(0)通常用在子程序中
@@ -377,11 +238,7 @@ os.getcwd()返回当前工作目录绝对路径。
 
 判断字典中是否含有某个元素 if key in dict:
 
-sed  ’s/text1/text2/g’  filename
-
-sudo [-R] chown chencheng:chencheng file
-
-python 多线程教程：https://www.cnblogs.com/kaituorensheng/p/4465768.html
+python 教程：https://www.cnblogs.com/kaituorensheng/p/4465768.html
 
 当改变网络某一层的channel的时候，使用pretrain要注意，因为导入pretrain参数是根据层的名称的，所以要换一个新的名字。
 
