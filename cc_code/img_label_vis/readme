@@ -1,9 +1,0 @@
-this file is used to visualize img and label.  
-label file type should be h5 or xml or txt.
-
-txt needs to be [cls_id, x1, y1, width , height, score] in each line
-
-you should make img_label_list first, just like img_h5, img_xml
-
-you can execute it by : python img_label_vis img_h5
-

@@ -1,7 +1,0 @@
-显示桌面：cmd+F3
-全屏：ctrl+cmd+F
-Command-Shift-4 截取所选屏幕区域到一个文件　　
-Command-Shift-3 截取全部屏幕到文件
-Command-H 隐藏（Hide）当前正在运行的应用程序窗口
-Command-Shift-Z 重做，也就是撤销的逆向操作
-Command-Option-V 剪切文件
